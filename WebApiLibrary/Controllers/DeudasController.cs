@@ -5,39 +5,39 @@ using WebApiLibrary.Entidades;
 namespace WebApiLibrary.Controllers
 {
     [ApiController]
-    [Route("api/prestamos")]
-    public class PrestamosController : ControllerBase
+    [Route("api/deudas")]
+    public class DeudasController : ControllerBase
     {
         private readonly ApplicationDbContext context;
 
-        public PrestamosController(ApplicationDbContext context)
+        public DeudasController(ApplicationDbContext context)
         {
             this.context = context;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<List<Prestamo>>> Get()
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<Deuda>> Get(int id)
         {
-            return await context.Prestamos.Include(x => x.Usuario).Include(x => x.Libro).Include(x => x.Deudas).ToListAsync();
+            return await context.Deudas.Include(x => x.Prestamo).Include(x => x.Prestamo.Usuario).Include(x => x.Prestamo.Libro).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post(Prestamo prestamo)
+        public async Task<ActionResult> Post(Deuda deuda)
         {
-            context.Add(prestamo);
+            context.Add(deuda);
             await context.SaveChangesAsync();
             return Ok();
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> Put(Prestamo prestamo, int id)
+        public async Task<ActionResult> Put(Deuda deuda, int id)
         {
-            if (prestamo.Id != id)
+            if (deuda.Id != id)
             {
-                return BadRequest("El ID del prestamo no concide con el establecido en la base de datos");
+                return BadRequest("El ID de la deuda no concide con el establecido en la base de datos");
             }
 
-            context.Update(prestamo);
+            context.Update(deuda);
             await context.SaveChangesAsync();
             return Ok();
         }
@@ -45,13 +45,13 @@ namespace WebApiLibrary.Controllers
         [HttpDelete]
         public async Task<ActionResult> Delete(int id)
         {
-            var exist = await context.Prestamos.AnyAsync(x => x.Id == id);
+            var exist = await context.Deudas.AnyAsync(x => x.Id == id);
             if (!exist)
             {
                 return NotFound();
             }
 
-            context.Remove(new Prestamo()
+            context.Remove(new Deuda()
             {
                 Id = id
             });
