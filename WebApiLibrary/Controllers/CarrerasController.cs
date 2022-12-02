@@ -38,14 +38,14 @@ namespace WebApiLibrary.Controllers
 
         [HttpPut("{id:int}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "EsAdmin")]
-        public async Task<ActionResult> Put(Usuario usuario, int id)
+        public async Task<ActionResult> Put(Carrera carrera, int id)
         {
-            if (usuario.Id != id)
+            if (carrera.Id != id)
             {
                 return BadRequest("El ID del usuario no concide con el establecido en la base de datos");
             }
 
-            context.Update(usuario);
+            context.Update(carrera);
             await context.SaveChangesAsync();
             return Ok();
         }
@@ -55,13 +55,13 @@ namespace WebApiLibrary.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "EsAdmin")]
         public async Task<ActionResult> Delete(int id)
         {
-            var exist = await context.Usuarios.AnyAsync(x => x.Id == id);
+            var exist = await context.Carreras.AnyAsync(x => x.Id == id);
             if (!exist)
             {
                 return NotFound();
             }
 
-            context.Remove(new Usuario()
+            context.Remove(new Carrera()
             {
                 Id = id
             });
