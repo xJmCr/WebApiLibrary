@@ -42,7 +42,7 @@ namespace WebApiLibrary.Controllers
         {
             if (carrera.Id != id)
             {
-                return BadRequest("El ID del usuario no concide con el establecido en la base de datos");
+                return BadRequest("El ID de la carrera no concide con el establecido en la base de datos");
             }
 
             context.Update(carrera);
