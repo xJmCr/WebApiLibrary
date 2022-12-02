@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApiLibrary.Entidades;
 
@@ -6,6 +8,7 @@ namespace WebApiLibrary.Controllers
 {
     [ApiController]
     [Route("api/prestamos")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PrestamosController : ControllerBase
     {
         private readonly ApplicationDbContext context;
@@ -16,12 +19,14 @@ namespace WebApiLibrary.Controllers
         }
 
         [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<Prestamo>>> Get()
         {
             return await context.Prestamos.Include(x => x.Usuario).Include(x => x.Libro).Include(x => x.Deudas).ToListAsync();
         }
 
         [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "EsAdmin")]
         public async Task<ActionResult> Post(Prestamo prestamo)
         {
             context.Add(prestamo);
@@ -30,6 +35,7 @@ namespace WebApiLibrary.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "EsAdmin")]
         public async Task<ActionResult> Put(Prestamo prestamo, int id)
         {
             if (prestamo.Id != id)
@@ -43,6 +49,7 @@ namespace WebApiLibrary.Controllers
         }
 
         [HttpDelete]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "EsAdmin")]
         public async Task<ActionResult> Delete(int id)
         {
             var exist = await context.Prestamos.AnyAsync(x => x.Id == id);

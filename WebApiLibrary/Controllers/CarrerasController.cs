@@ -8,7 +8,6 @@ namespace WebApiLibrary.Controllers
 {
     [ApiController]
     [Route("api/carreras")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class CarrerasController : ControllerBase
     {
         private readonly ApplicationDbContext context;
@@ -20,6 +19,7 @@ namespace WebApiLibrary.Controllers
 
 
         [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<Carrera>>> Get()
         {
             return await context.Carreras.Include(x => x.Usuarios).ToListAsync();
@@ -27,6 +27,7 @@ namespace WebApiLibrary.Controllers
 
 
         [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "EsAdmin")]
         public async Task<ActionResult> Post(Carrera carrera)
         {
             context.Add(carrera);
@@ -36,6 +37,7 @@ namespace WebApiLibrary.Controllers
 
 
         [HttpPut("{id:int}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "EsAdmin")]
         public async Task<ActionResult> Put(Usuario usuario, int id)
         {
             if (usuario.Id != id)
@@ -50,6 +52,7 @@ namespace WebApiLibrary.Controllers
 
 
         [HttpDelete]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "EsAdmin")]
         public async Task<ActionResult> Delete(int id)
         {
             var exist = await context.Usuarios.AnyAsync(x => x.Id == id);

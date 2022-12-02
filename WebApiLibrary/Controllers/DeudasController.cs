@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApiLibrary.Entidades;
 
@@ -16,12 +18,14 @@ namespace WebApiLibrary.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Deuda>> Get(int id)
         {
             return await context.Deudas.Include(x => x.Prestamo).Include(x => x.Prestamo.Usuario).Include(x => x.Prestamo.Libro).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "EsAdmin")]
         public async Task<ActionResult> Post(Deuda deuda)
         {
             context.Add(deuda);
@@ -30,6 +34,7 @@ namespace WebApiLibrary.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "EsAdmin")]
         public async Task<ActionResult> Put(Deuda deuda, int id)
         {
             if (deuda.Id != id)
@@ -43,6 +48,7 @@ namespace WebApiLibrary.Controllers
         }
 
         [HttpDelete]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "EsAdmin")]
         public async Task<ActionResult> Delete(int id)
         {
             var exist = await context.Deudas.AnyAsync(x => x.Id == id);

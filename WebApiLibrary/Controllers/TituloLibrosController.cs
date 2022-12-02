@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApiLibrary.Entidades;
 
@@ -6,6 +8,7 @@ namespace WebApiLibrary.Controllers
 {
     [ApiController]
     [Route("api/TituloLibro")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TituloLibrosController : ControllerBase
     {
         private readonly ApplicationDbContext context;
@@ -17,6 +20,7 @@ namespace WebApiLibrary.Controllers
 
 
         [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<TituloLibro>>> Get()
         {
             return await context.TituloLibros.Include(x => x.libros).ToListAsync();
@@ -24,6 +28,7 @@ namespace WebApiLibrary.Controllers
 
 
         [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "EsAdmin")]
         public async Task<ActionResult> Post(TituloLibro tituloLibro)
         {
             context.Add(tituloLibro);
@@ -33,6 +38,7 @@ namespace WebApiLibrary.Controllers
 
 
         [HttpPut("{id:int}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "EsAdmin")]
         public async Task<ActionResult> Put(TituloLibro tituloLibro, int id)
         {
             if (tituloLibro.Id != id)
@@ -47,6 +53,7 @@ namespace WebApiLibrary.Controllers
 
 
         [HttpDelete]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "EsAdmin")]
         public async Task<ActionResult> Delete(int id)
         {
             var exist = await context.TituloLibros.AnyAsync(x => x.Id == id);

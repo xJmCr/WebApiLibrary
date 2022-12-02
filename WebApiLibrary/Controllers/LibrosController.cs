@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApiLibrary.Entidades;
 
@@ -6,6 +8,7 @@ namespace WebApiLibrary.Controllers
 {
     [ApiController]
     [Route("api/libros")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class LibrosController : ControllerBase
     {
         private readonly ApplicationDbContext context;
@@ -17,6 +20,7 @@ namespace WebApiLibrary.Controllers
 
 
         [HttpGet("{id:int}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Libro>> Get(int id)
         {
             return await context.Libros.Include(x => x.TituloLibro).FirstOrDefaultAsync(x => x.Id == id);
@@ -24,6 +28,7 @@ namespace WebApiLibrary.Controllers
 
 
         [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "EsAdmin")]
         public async Task<ActionResult> Post(Libro libro)
         {
             var existeLibro = await context.TituloLibros.AnyAsync(x => x.Id == libro.TituloLibroId);
